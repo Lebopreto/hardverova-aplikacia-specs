@@ -1,0 +1,244 @@
+<!--Autor: Martin Chlebovec alias: martinius96-->
+<!--Podpora: https://www.paypal.me/Chlebovec-->
+<!--Osobný web: https://arduino.php5.sk-->
+<!--Email kontakt: martinius96@gmail.com-->
+<!--Facebook kontakt: 100001242570317-->
+<!--Používajte v súhade s licenciou!-->
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>HARDWARE APP</title>
+<script src="./assets/js/jquery.min.js" type="text/javascript"></script>
+<script src="./assets/js/bootstrap.min.js" type="text/javascript"></script>
+<script type="text/javascript" src="./assets/js/underscore-min.js"></script>
+<script type="text/javascript" src="./assets/js/core-estimator.min.js"></script>
+<script type="text/javascript" src="./assets/js/webglreport.js"></script>
+<script type="text/javascript" src="./assets/js/stat.js"></script>
+<script type="text/javascript" src="./assets/js/jquery.localScroll.min.js"></script>
+<script type="text/javascript" src="./assets/js/jquery.scrollTo.min.js"></script>   
+<link href="./assets/css/bootstrap.min.css" type="text/css" rel="stylesheet">
+<link href="./assets/css/font-awesome.css" rel="stylesheet">
+<link href="./assets/css/style.css" rel="stylesheet">
+<script type="text/javascript">$(document).ready(function(){$(".localScroll").localScroll({hash:true});$("#screen-resolution").text(detect.screenWidth()+" x "+detect.screenHeight());$("#browser-resolution").text(detect.viewportWidth()+" x "+detect.viewportHeight());});</script>
+</head>
+<body data-spy="scroll" data-target="#nav"><nav class="navbar navbar-inverse navbar-fixed-top" id="nav" >
+<div class="container" >
+<div class="navbar-header">
+<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
+<span class="sr-only">Toggle navigation</span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+</button>
+<a class="navbar-brand" href="index.html">
+<img src="./assets/images/js.png" width=52px height=50px> HARDWARE  <span class="label label-success">APP</span> Optimalized for <a href="https://www.google.com/chrome"><img src="./assets/images/chrome.png" width=48 height=48></a></div>
+<div class="collapse navbar-collapse" id="navbar-collapse">
+</div>
+  </div><main>
+  <div id="top" class="section" style="background-color: #2980b9;padding-top:100px;">         
+  <div class="container"> 
+<table class="table table-striped bg-white">
+<tbody>
+<tr><td> <img src="assets/images/cpu.png" alt="cpu.png, 565B" title="CPU" height="48" width="48"></td><td>CPU Cores</td><td> 
+<a href="#" onload="run(this); return false;"  id="ok"></a>
+<div id="core-list-cont"></div>
+<p id="info"></p>
+<script type="application/javascript">
+var dom_implemented = navigator.hardwareConcurrency;
+</script> 
+<script type="application/javascript">
+var CoreList = (function() {
+    "use strict";
+    function CoreList(parent) {
+        this.min = 1;
+        this.max = 1;
+        this.current = 0;
+ 
+        this.ol = document.createElement('ol');
+        this.ol.className = 'core-list';
+        parent.appendChild(this.ol);
+    }
+ 
+    CoreList.prototype.update = function(min, max, current) {
+        if (!isFinite(max))
+            max = min * 2;
+ 
+        for (var i = 1; i <= max + 1; i++) {
+            var core = this.ol.childNodes[i - 1];
+ 
+            // Remove extra
+            if (i > max) {
+                while (core) {
+                    var next = core.nextSibling;
+                    this.ol.removeChild(core);
+                    core = next;
+                }
+                break;
+            }
+ 
+            // Create needed
+            if (!core) {
+                core = document.createElement('li');
+                core.appendChild(document.createTextNode(i));
+                this.ol.appendChild(core);
+            }
+ 
+            // Set properties
+            core.className = "core" + ((i > min) ? ' core-possible' : '') + ((i === current) ? ' core-testing' : '');
+        }
+ 
+        this.min = min;
+        this.max = max;
+        this.current = current;
+ 
+    };
+    return CoreList;
+}());
+ 
+var info = document.getElementById('info');
+var running = false;
+var corelist = new CoreList(document.getElementById("core-list-cont"));
+ 
+function run(btn) {
+    var start; 
+    if (running) return; 
+    running = true;
+    start = Date.now();
+    btn.classList.add("disabled");
+    btn.innerHTML = "Running...";
+    info.innerHTML = "";
+ 
+    var options = {
+        progress: corelist.update.bind(corelist),
+        use_cache: false
+    };
+ 
+    navigator.getHardwareConcurrency(function() {
+ 
+        btn.classList.remove("disabled");
+        btn.innerHTML = "";
+        running = false;
+ 
+        var seconds = (Date.now() - start) / 1000;
+        var answer = navigator.hardwareConcurrency;
+ 
+        info.innerHTML = "" +
+            (answer === 1 ? "1 core" : answer + " cores");
+ 
+        corelist.set(answer);
+ 
+       
+ 
+        var no = document.createElement("a");
+        no.href = "#";
+        no.appendChild(document.createTextNode("No"));
+        no.onclick = function() { sendFeedback(feedback, false); return false; };
+ 
+        feedback.appendChild(yes);
+        feedback.appendChild(document.createTextNode(" / "));
+        feedback.appendChild(no);
+ 
+   
+ 
+        _gaq.push(['_trackEvent', 'core-estimator', 'run', answer + ' cores']);
+ 
+    }, options);
+ 
+    function sendFeedback(parent, accurate) {
+        while (parent.lastChild)
+            parent.removeChild(parent.lastChild);
+ 
+        parent.appendChild(document.createTextNode("Thank you for your feedback!"));
+ 
+        _gaq.push(['_trackEvent', 'core-estimator', 'feedback', 'Accurate?', +accurate]);
+    }
+}
+ 
+if (dom_implemented || navigator.mimeTypes["application/x-pnacl"]) {
+    run(document.getElementById("ok"));
+}
+</script></td></tr> 
+  <tr><td> <img src="./assets/images/networkcard.png" alt="Networkcard.png, 479B" title="Network Card" height="48" width="48"></td><td>Graphic card</td><td>
+  <script type="text/template" id="reportTemplate">
+        
+            
+            
+            <% if (typeof report.contextName !== 'undefined') { %>
+            
+          
+            <% if (report.unMaskedVendor !== '') { %>
+           
+            <% } %>
+            <% if (report.unMaskedRenderer !== '') { %>
+            <tr>
+
+                <td> <%= report.unMaskedRenderer %></td>
+            </tr>
+            <% } %>
+             <% } %>
+        
+    </script>           
+    <script type="text/template" id="webglSupportedTemplate"> 
+      </script>
+    <script type="text/template" id="webglSupportedChromeFrameTemplate">
+        
+    </script>
+
+    <script type="text/template" id="webglNotSupportedTemplate">
+        <div class="header">
+            <p>&times; Tento prehliadač nepodporuje WebGL <%= report.webglVersion %></p>
+            <% if (report.webglVersion === 2 && report.userAgent.indexOf('Firefox') !== -1) { %>
+          
+            <% } else { %>
+           
+            <% } %>
+        </div>
+    </script>
+
+    <script type="text/template" id="webglNotEnabledTemplate">
+        <div class="header">
+          
+                        
+        </div>
+    </script>
+
+    <script type="text/template" id="webglVersionTabs">
+        
+    </script>
+    
+
+    <div class="main-output" id="output">  </div> 
+<div id="cont">
+<a href="#" onload="run(this); return false;"  id="ok"></a>
+<div id="core-list-cont"></div>
+
+</div>
+ 
+<script type="application/javascript">
+var dom_implemented = navigator.hardwareConcurrency;
+</script>
+
+      </td></tr>
+  <tr><td> <img src="./assets/images/ethernet.png" alt="Ethernet On-48.png, 457B" title="Ethernet On 48" height="48" width="48"> </td><td>Browser</td><td><script src="./assets/js/browser.js">
+</script></td></tr>
+  <tr><td> <img src="./assets/images/laptop.png" alt="Laptop-48.png, 532B" title="Laptop 48" height="48" width="48"> </td><td>Screen resoluion</td><td><script src="./assets/js/screen.js">
+</script></td></tr>
+  <tr><td> <img src="./assets/images/colors_rgb.png" alt="colors_rgb.png, 4,5kB" title="Colors rgb" height="48" width="48"></td><td>Buffer deep</td><td><script src="./assets/js/buffer.js"></script></td></tr>
+  <tr><td> <img src="./assets/images/operating_system-48.png" alt="operating_system-48.png, 1,1kB" title="Operating system 48" height="48" width="48"> </td><td>Operating system</td><td><script src="./assets/js/os.js"></script></td></tr>
+  
+  </table>
+
+  
+  
+  
+  
+   </center>'; 
+
+  
+  </main></span>
+      
+     </div></div> 
+ 
+         
+
+
+</body></html>                                                                                   
